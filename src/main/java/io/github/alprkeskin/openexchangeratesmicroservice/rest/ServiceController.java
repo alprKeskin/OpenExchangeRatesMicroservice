@@ -3,20 +3,16 @@ package io.github.alprkeskin.openexchangeratesmicroservice.rest;
 import io.github.alprkeskin.openexchangeratesmicroservice.model.LatestEndFormat;
 import io.github.alprkeskin.openexchangeratesmicroservice.service.ExchangeRatesService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpStatusCodeException;
 
 import static org.springframework.http.ResponseEntity.ok;
-import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping("/api")
 public class ServiceController {
     @Autowired
     private ExchangeRatesService service;
-
 
     @GetMapping("/{apiEndpoint}")
     public ResponseEntity<LatestEndFormat> getResponse(
@@ -38,7 +34,7 @@ public class ServiceController {
             throw new RuntimeException("Base cannot be changed in unlimited plan!");
         }
         else {
-            return ok(service.getLatest(apiEndpoint, app_id, base, symbols, prettyprint, show_alternative));
+            return ok(service.getAndSaveLatest(apiEndpoint, app_id, base, symbols, prettyprint, show_alternative));
         }
     }
 }

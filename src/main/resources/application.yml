@@ -1,4 +1,3 @@
-
 server:
   port: 8082
 
@@ -15,6 +14,6 @@ spring:
       authentication-database: admin
       username: rootuser
       password: rootpass
-      database: amigoscode
+      database: exchangeServiceDatabase
       port: 27017
       host: localhost

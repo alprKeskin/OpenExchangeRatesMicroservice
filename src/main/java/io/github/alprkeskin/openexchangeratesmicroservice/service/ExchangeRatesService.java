@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.util.List;
-import java.util.function.Consumer;
 
 @Service
 public class ExchangeRatesService {
@@ -31,13 +29,27 @@ public class ExchangeRatesService {
     private String URL;
 
 
+    // this will be used to save the data to our mongoDb database
     @Autowired
     private LatestEndFormatRepository latestEndFormatRepository;
+
+    // this method saves the latest object to our database
+    public void saveLatest(LatestEndFormat latestObject) {
+        latestEndFormatRepository.save(latestObject);
+    }
+
+    public LatestEndFormat getAndSaveLatest(String apiEndpoint, String app_id, String base, String symbols, boolean prettyprint, boolean show_alternative) {
+        // get the latest exchange values
+        LatestEndFormat latest = getLatest(apiEndpoint, app_id, base, symbols, prettyprint, show_alternative);
+        // save them to our database
+        saveLatest(latest);
+        // return the object
+        return latest;
+    }
 
 
     public LatestEndFormat getLatest(String apiEndpoint, String app_id, String base, String symbols, boolean prettyprint, boolean show_alternative) {
         LatestEndFormat latest = restTemplate.getForObject(getUri(apiEndpoint, app_id, base, symbols, prettyprint, show_alternative), LatestEndFormat.class);
-        latestEndFormatRepository.save(latest);
         return latest;
     }
 
