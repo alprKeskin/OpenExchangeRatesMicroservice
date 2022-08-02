@@ -1,0 +1,20 @@
+
+server:
+  port: 8082
+
+alprkeskin:
+  consumed-urls:
+    api: "https://openexchangerates.org/api/"
+
+api:
+  key: "8749ae82dbde4276a7554e13d03ad71e"
+
+spring:
+  data:
+    mongodb:
+      authentication-database: admin
+      username: rootuser
+      password: rootpass
+      database: amigoscode
+      port: 27017
+      host: localhost
