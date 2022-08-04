@@ -1,40 +1,57 @@
 package io.github.alprkeskin.openexchangeratesmicroservice.rest;
 
-import io.github.alprkeskin.openexchangeratesmicroservice.model.LatestEndFormat;
-import io.github.alprkeskin.openexchangeratesmicroservice.service.ExchangeRatesService;
+import io.github.alprkeskin.openexchangeratesmicroservice.model.CurrencyRates;
+import io.github.alprkeskin.openexchangeratesmicroservice.service.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.ResponseEntity.ok;
+import java.time.LocalDate;
 
+// Bir http isteği geldiğinde bu class'ın method'ları otomatik olarak path'e göre çalışacaktır.
 @RestController
 @RequestMapping("/api")
 public class ServiceController {
+
     @Autowired
-    private ExchangeRatesService service;
+    MainService mainService;
 
-    @GetMapping("/{apiEndpoint}")
-    public ResponseEntity<LatestEndFormat> getResponse(
-            @PathVariable("apiEndpoint") String apiEndpoint,
-            @RequestParam(value = "app_id", required = true) String app_id,
-            @RequestParam(value = "base", required = false, defaultValue = "USD") String base,
-            @RequestParam(value = "symbols", required = false, defaultValue = "XXX") String symbols,
-            @RequestParam(value = "prettyprint", required = false, defaultValue = "false") boolean prettyprint,
-            @RequestParam(value = "show_alternative", required = false, defaultValue = "false") boolean show_alternative) {
-        System.out.println("--------- ServiceController::getResponse ---------");
-        System.out.println("int apiEndpoint: " + apiEndpoint);
-        System.out.println("String appId: " + app_id);
-        System.out.println("String base: " + base);
-        System.out.println("String symbols: " + symbols);
-        System.out.println("boolean prettyprint: " + prettyprint);
-        System.out.println("boolean show_alternative: " + show_alternative);
+    // http://localhost:8082/api/2012-07-10.json?symbols=TRY
 
-        if (!base.equals("USD")) {
-            throw new RuntimeException("Base cannot be changed in unlimited plan!");
+    @GetMapping(value = {"", "/{requestedDate}"})
+    public ResponseEntity<CurrencyRates> getResponse(
+            @PathVariable(value = "requestedDate", required = false) String requestedDate,
+            @RequestParam(value = "symbols", required = false, defaultValue = "XXX") String symbols) {
+
+        LocalDate desiredDate;
+        String endpoint;
+
+        // if we want to pull the latest currency rates
+        if (requestedDate == null) {
+            // pull the related date
+            desiredDate = LocalDate.now();
+            // assign the related endpoint
+            endpoint = "latest.json";
         }
+        // if we want to pull the historical currency rates
         else {
-            return ok(service.getAndSaveLatest(apiEndpoint, app_id, base, symbols, prettyprint, show_alternative));
+            // modify the requested date properly
+            desiredDate = LocalDate.parse(requestedDate.substring(0,10));
+            // if the desired date is in the future of the current date
+            if (desiredDate.compareTo(LocalDate.now()) >= 0) {
+                // throw a runtime exception
+                // after this point the thread terminates
+                throw new RuntimeException("Requested date cannot be greater than or equal to today!");
+            }
+            // assign the related endpoint
+            endpoint = requestedDate;
         }
+
+        // return the response
+        return mainService.getResponse(endpoint, symbols, desiredDate);
     }
 }
+
+
+
