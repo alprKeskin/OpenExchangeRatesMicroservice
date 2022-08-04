@@ -1,43 +1,40 @@
 package io.github.alprkeskin.openexchangeratesmicroservice.rest;
 
-import io.github.alprkeskin.openexchangeratesmicroservice.model.CurrencyRates;
-import io.github.alprkeskin.openexchangeratesmicroservice.service.MainService;
+import io.github.alprkeskin.openexchangeratesmicroservice.model.LatestEndFormat;
+import io.github.alprkeskin.openexchangeratesmicroservice.service.ExchangeRatesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import static org.springframework.http.ResponseEntity.ok;
 
-// Bir http isteği geldiğinde bu class'ın method'ları otomatik olarak path'e göre çalışacaktır.
 @RestController
 @RequestMapping("/api")
 public class ServiceController {
-
     @Autowired
-    MainService mainService;
+    private ExchangeRatesService service;
 
-    // latest endpoint
-    @GetMapping("/{latestEndpoint}")
-    public ResponseEntity<CurrencyRates> getResponseLatest(
-            @PathVariable(value = "latestEndpoint") String latestEndpoint,
-            @RequestParam(value = "symbols", required = false, defaultValue = "XXX") String symbols) {
-        // pull the related date
-        LocalDate dateOfToday = LocalDate.now();
-        // return the response
-        return mainService.getResponse(latestEndpoint, symbols, dateOfToday);
-    }
+    @GetMapping("/{apiEndpoint}")
+    public ResponseEntity<LatestEndFormat> getResponse(
+            @PathVariable("apiEndpoint") String apiEndpoint,
+            @RequestParam(value = "app_id", required = true) String app_id,
+            @RequestParam(value = "base", required = false, defaultValue = "USD") String base,
+            @RequestParam(value = "symbols", required = false, defaultValue = "XXX") String symbols,
+            @RequestParam(value = "prettyprint", required = false, defaultValue = "false") boolean prettyprint,
+            @RequestParam(value = "show_alternative", required = false, defaultValue = "false") boolean show_alternative) {
+        System.out.println("--------- ServiceController::getResponse ---------");
+        System.out.println("int apiEndpoint: " + apiEndpoint);
+        System.out.println("String appId: " + app_id);
+        System.out.println("String base: " + base);
+        System.out.println("String symbols: " + symbols);
+        System.out.println("boolean prettyprint: " + prettyprint);
+        System.out.println("boolean show_alternative: " + show_alternative);
 
-    // historical endpoint
-    @GetMapping("historical/{historicalEndpoint}")
-    public ResponseEntity<CurrencyRates> getResponseHistorical(
-            @PathVariable(value = "historicalEndpoint") String historicalEndpoint,
-            @RequestParam(value = "symbols", required = false, defaultValue = "XXX") String symbols){
-        // modify the desired day properly
-        LocalDate desiredDate = LocalDate.parse(historicalEndpoint.substring(0,10));
-        // return the response
-        return mainService.getResponse(historicalEndpoint, symbols, desiredDate);
+        if (!base.equals("USD")) {
+            throw new RuntimeException("Base cannot be changed in unlimited plan!");
+        }
+        else {
+            return ok(service.getAndSaveLatest(apiEndpoint, app_id, base, symbols, prettyprint, show_alternative));
+        }
     }
 }
-
-
-
