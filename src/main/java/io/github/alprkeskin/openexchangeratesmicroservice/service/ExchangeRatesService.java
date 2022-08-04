@@ -1,8 +1,7 @@
 package io.github.alprkeskin.openexchangeratesmicroservice.service;
 
-import io.github.alprkeskin.openexchangeratesmicroservice.model.LatestEndFormat;
-import io.github.alprkeskin.openexchangeratesmicroservice.properties.LatestEndUrlProperties;
-import io.github.alprkeskin.openexchangeratesmicroservice.repositories.LatestEndFormatRepository;
+import io.github.alprkeskin.openexchangeratesmicroservice.model.CurrencyRates;
+import io.github.alprkeskin.openexchangeratesmicroservice.properties.CurrencyRatesUrlProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,13 +9,14 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 
+
 @Service
 public class ExchangeRatesService {
 
     // it is used to use a string
     // its value is injected in LatestEndUrlProperties class under the package "properties"
     @Autowired
-    private LatestEndUrlProperties urlProperties;
+    private CurrencyRatesUrlProperties urlProperties;
 
     // it autowires to the bean produced by RestTemplateConfig class under the package "config"
     @Autowired
@@ -28,47 +28,33 @@ public class ExchangeRatesService {
     @Value("${alprkeskin.consumed-urls.api}")
     private String URL;
 
+    // default values of query parameters
+    @Value("${query-parameter.app_id}")
+    String app_id;
+    @Value("${query-parameter.base}")
+    String base;
+    @Value("${query-parameter.prettyprint}")
+    boolean prettyprint;
+    @Value("${query-parameter.show_alternative}")
+    boolean show_alternative;
 
-    // this will be used to save the data to our mongoDb database
-    @Autowired
-    private LatestEndFormatRepository latestEndFormatRepository;
-
-    // this method saves the latest object to our database
-    public void saveLatest(LatestEndFormat latestObject) {
-        latestEndFormatRepository.save(latestObject);
+    public CurrencyRates getCurrencyRates(String endpoint, String symbols) {
+        return restTemplate.getForObject(getUri(endpoint, symbols), CurrencyRates.class);
     }
 
-    public LatestEndFormat getAndSaveLatest(String apiEndpoint, String app_id, String base, String symbols, boolean prettyprint, boolean show_alternative) {
-        // get the latest exchange values
-        LatestEndFormat latest = getLatest(apiEndpoint, app_id, base, symbols, prettyprint, show_alternative);
-        // save them to our database
-        saveLatest(latest);
-        // return the object
-        return latest;
-    }
-
-
-    public LatestEndFormat getLatest(String apiEndpoint, String app_id, String base, String symbols, boolean prettyprint, boolean show_alternative) {
-        LatestEndFormat latest = restTemplate.getForObject(getUri(apiEndpoint, app_id, base, symbols, prettyprint, show_alternative), LatestEndFormat.class);
-        return latest;
-    }
-
-    public URI getUri(String apiEndpoint, String app_id, String base, String symbols, boolean prettyprint, boolean show_alternative) {
-        // String url = readFromValue ? URL : urlProperties.getApi();
-        String url = URL;
-        System.out.println("--------- ExchangeRatesService::getUri ---------");
-        System.out.println("Returned URI: " +
-                url + apiEndpoint + "?" + "app_id=" + app_id +
-                "&" + "base=" + base +
-                "&" + "symbols=" + symbols +
-                "&" + "prettyprint=" + prettyprint +
-                "&" + "show_alternative=" + show_alternative);
+    public URI getUri(String endpoint, String symbols) {
+        // URL: https://openexchangerates.org/api/
+        String commonUrl = URL;
 
         // initialize http request parses
-        String path = url + apiEndpoint;
+        // if we want to reach historical endpoint
+        if (!endpoint.equals("latest.json")) {
+            // update the endpoint such that apiEndpoint = "historical/2012-07-08.json"
+            endpoint = "historical/" + endpoint;
+        }
+        String path = commonUrl + endpoint;
         String queryStart = "?";
         String app_idPart = "app_id=" + app_id;
-        String basePart = "&base=" + base;
         String symbolsPart;
         if (symbols.equals("XXX")) {
             symbolsPart = "";
@@ -79,7 +65,10 @@ public class ExchangeRatesService {
         String prettyprintPart = "&prettyprint=" + prettyprint;
         String show_alternativePart = "&show_alternative=" + show_alternative;
 
-        return URI.create(path + queryStart + app_idPart + symbolsPart + prettyprintPart + show_alternativePart);
 
+        return URI.create(path + queryStart + app_idPart + symbolsPart + prettyprintPart + show_alternativePart);
     }
 }
+
+
+
