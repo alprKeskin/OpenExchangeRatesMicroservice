@@ -10,6 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 // value injection
 @ConfigurationProperties(prefix = "alprkeskin.consumed-urls")
-public class CurrencyRatesUrlProperties {
+public class LatestEndUrlProperties {
     private String api;
 }
