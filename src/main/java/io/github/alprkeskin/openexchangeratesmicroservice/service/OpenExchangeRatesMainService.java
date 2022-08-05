@@ -12,31 +12,29 @@ import java.util.Optional;
 import static org.springframework.http.ResponseEntity.ok;
 
 @Service
-public class MainService {
+public class OpenExchangeRatesMainService {
     @Autowired
     private ExchangeRatesService exchangeRatesService;
     @Autowired
     private DatabaseService databaseService;
 
 
-    public ResponseEntity<CurrencyRates> getResponse(String endpoint, String symbols, LocalDate date) {
+    public ResponseEntity<CurrencyRates> getResponse(LocalDate date, String symbols) {
 
         // try to take the currency rates of the related date from database
         Optional<CurrencyRates> currencyRates = databaseService.findCurrencyRatesById(date);
         // if there is no any current rates object of the related date in the database
-        if (currencyRates.equals(Optional.empty())) {
+        if (!currencyRates.isPresent()) {
             // pull the current rates of related date from open exchange rates website
-            CurrencyRates currencyRatesOfRelatedDate = exchangeRatesService.getCurrencyRates(endpoint, symbols);
+            CurrencyRates currencyRatesOfRelatedDate = exchangeRatesService.getCurrencyRates(date, symbols);
             // save related date's current rates to the database
             databaseService.saveCurrencyRates(currencyRatesOfRelatedDate, date);
             // give a response to the user
             return ok(currencyRatesOfRelatedDate);
         }
         // if there exist a current rates object of related date in the database
-        else {
-            // return the currency rates object of related date from the database
-            // currencyRates.get() ==> currencyRate without optional
-            return ok(currencyRates.get());
-        }
+        // return the currency rates object of related date from the database
+        // currencyRates.get() ==> currencyRate without optional
+        return ok(currencyRates.get());
     }
 }

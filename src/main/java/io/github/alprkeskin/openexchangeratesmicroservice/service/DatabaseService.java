@@ -8,8 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Optional;
 
-// @Service annotation creates a bean of the service class
-// So you can use @Autowired
+/** => @Service annotation creates a bean of the service class. So, you can use @Autowired **/
 @Service
 public class DatabaseService {
     // this will be used to save the data to our mongoDb database
@@ -18,8 +17,7 @@ public class DatabaseService {
 
     // this method finds the currency rates object in our database according to its date. And return it.
     public Optional<CurrencyRates> findCurrencyRatesById(LocalDate localDate) {
-        Optional<CurrencyRates> currencyRates = currencyRatesRepository.findById(localDate.toString());
-        return currencyRates;
+        return currencyRatesRepository.findById(localDate.toString());
     }
 
     // this method saves the currency rates object to our database
