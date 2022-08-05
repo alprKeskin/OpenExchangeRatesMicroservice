@@ -21,7 +21,7 @@ public class OpenExchangeRatesMicroserviceApplication {
     }
 
 
-    private Logger logger = Logger.getLogger(OpenExchangeRatesMicroserviceApplication.class.getName());
+    private final Logger logger = Logger.getLogger("OpenExchangeRatesMicroserviceApplication.class");
 
     @Autowired
     private OpenExchangeRatesMainService openExchangeRatesMainService;

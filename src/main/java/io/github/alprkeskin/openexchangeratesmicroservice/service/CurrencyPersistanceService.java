@@ -10,7 +10,7 @@ import java.util.Optional;
 
 /** => @Service annotation creates a bean of the service class. So, you can use @Autowired **/
 @Service
-public class DatabaseService {
+public class CurrencyPersistanceService {
     // this will be used to save the data to our mongoDb database
     @Autowired
     private CurrencyRatesRepository currencyRatesRepository;

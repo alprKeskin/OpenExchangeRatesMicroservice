@@ -16,19 +16,19 @@ public class OpenExchangeRatesMainService {
     @Autowired
     private ExchangeRatesService exchangeRatesService;
     @Autowired
-    private DatabaseService databaseService;
+    private CurrencyPersistanceService currencyPersistanceService;
 
 
     public ResponseEntity<CurrencyRates> getResponse(LocalDate date, String symbols) {
 
         // try to take the currency rates of the related date from database
-        Optional<CurrencyRates> currencyRates = databaseService.findCurrencyRatesById(date);
+        Optional<CurrencyRates> currencyRates = currencyPersistanceService.findCurrencyRatesById(date);
         // if there is no any current rates object of the related date in the database
         if (!currencyRates.isPresent()) {
             // pull the current rates of related date from open exchange rates website
             CurrencyRates currencyRatesOfRelatedDate = exchangeRatesService.getCurrencyRates(date, symbols);
             // save related date's current rates to the database
-            databaseService.saveCurrencyRates(currencyRatesOfRelatedDate, date);
+            currencyPersistanceService.saveCurrencyRates(currencyRatesOfRelatedDate, date);
             // give a response to the user
             return ok(currencyRatesOfRelatedDate);
         }
