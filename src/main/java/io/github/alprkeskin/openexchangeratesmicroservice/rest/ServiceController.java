@@ -18,13 +18,14 @@ public class ServiceController {
     @Autowired
     private OpenExchangeRatesMainService openExchangeRatesMainService;
 
-    Logger logger = Logger.getLogger("ServiceController.class");
+    private static final Logger logger = Logger.getLogger(ServiceController.class.getName());
 
     @GetMapping(value = {"", "/{requestedDate}"})
     public ResponseEntity<CurrencyRates> getResponse(
             @PathVariable(value = "requestedDate", required = false) String requestedDate,
             @RequestParam(value = "symbols", required = false, defaultValue = "XXX") String symbols) {
 
+        logger.log(Level.INFO, "ServiceController::getResponse");
         LocalDate desiredDate = requestedDate == null ? LocalDate.now(): DateUtil.getLocalDate(requestedDate);
         return openExchangeRatesMainService.getResponse(desiredDate, symbols);
     }

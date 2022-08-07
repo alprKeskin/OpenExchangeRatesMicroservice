@@ -24,7 +24,7 @@ public class OpenExchangeRatesMainService {
         // try to take the currency rates of the related date from database
         Optional<CurrencyRates> currencyRates = currencyPersistanceService.findCurrencyRatesById(date);
         // if there is no any current rates object of the related date in the database
-        if (!currencyRates.isPresent()) {
+        if (currencyRates.isEmpty()) {
             // pull the current rates of related date from open exchange rates website
             CurrencyRates currencyRatesOfRelatedDate = exchangeRatesService.getCurrencyRates(date, symbols);
             // save related date's current rates to the database
