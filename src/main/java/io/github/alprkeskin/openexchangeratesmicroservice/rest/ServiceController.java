@@ -1,40 +1,35 @@
 package io.github.alprkeskin.openexchangeratesmicroservice.rest;
 
-import io.github.alprkeskin.openexchangeratesmicroservice.model.LatestEndFormat;
-import io.github.alprkeskin.openexchangeratesmicroservice.service.ExchangeRatesService;
+import io.github.alprkeskin.openexchangeratesmicroservice.model.CurrencyRates;
+import io.github.alprkeskin.openexchangeratesmicroservice.service.OpenExchangeRatesMainService;
+import io.github.alprkeskin.openexchangeratesmicroservice.utils.DateUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.ResponseEntity.ok;
+import java.time.LocalDate;
 
+/** The methods of this class automatically run according to the given path when a http request is sent **/
 @RestController
 @RequestMapping("/api")
 public class ServiceController {
     @Autowired
-    private ExchangeRatesService service;
+    private OpenExchangeRatesMainService openExchangeRatesMainService;
 
-    @GetMapping("/{apiEndpoint}")
-    public ResponseEntity<LatestEndFormat> getResponse(
-            @PathVariable("apiEndpoint") String apiEndpoint,
-            @RequestParam(value = "app_id", required = true) String app_id,
-            @RequestParam(value = "base", required = false, defaultValue = "USD") String base,
-            @RequestParam(value = "symbols", required = false, defaultValue = "XXX") String symbols,
-            @RequestParam(value = "prettyprint", required = false, defaultValue = "false") boolean prettyprint,
-            @RequestParam(value = "show_alternative", required = false, defaultValue = "false") boolean show_alternative) {
-        System.out.println("--------- ServiceController::getResponse ---------");
-        System.out.println("int apiEndpoint: " + apiEndpoint);
-        System.out.println("String appId: " + app_id);
-        System.out.println("String base: " + base);
-        System.out.println("String symbols: " + symbols);
-        System.out.println("boolean prettyprint: " + prettyprint);
-        System.out.println("boolean show_alternative: " + show_alternative);
+    private static final Logger logger = LoggerFactory.getLogger(ServiceController.class);
 
-        if (!base.equals("USD")) {
-            throw new RuntimeException("Base cannot be changed in unlimited plan!");
-        }
-        else {
-            return ok(service.getAndSaveLatest(apiEndpoint, app_id, base, symbols, prettyprint, show_alternative));
-        }
+    @GetMapping(value = {"", "/{requestedDate}"})
+    public ResponseEntity<CurrencyRates> getResponse(
+            @PathVariable(value = "requestedDate", required = false) String requestedDate,
+            @RequestParam(value = "symbols", required = false, defaultValue = "XXX") String symbols) {
+
+        logger.info("ServiceController::getResponse");
+        LocalDate desiredDate = requestedDate == null ? LocalDate.now(): DateUtil.getLocalDate(requestedDate);
+        return openExchangeRatesMainService.getResponse(desiredDate, symbols);
     }
 }
+
+
+

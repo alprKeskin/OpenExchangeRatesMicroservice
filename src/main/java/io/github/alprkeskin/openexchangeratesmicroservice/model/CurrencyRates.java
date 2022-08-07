@@ -12,7 +12,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document
-public class LatestEndFormat {
+public class CurrencyRates {
     @Id
     private String id;
     private String disclaimer;
@@ -21,7 +21,7 @@ public class LatestEndFormat {
     private String base;
     private Map<String, Double> rates;
 
-    public LatestEndFormat(String disclaimer, String license, int timestamp, String base, Map<String, Double> rates) {
+    public CurrencyRates(String disclaimer, String license, int timestamp, String base, Map<String, Double> rates) {
         this.disclaimer = disclaimer;
         this.license = license;
         this.timestamp = timestamp;

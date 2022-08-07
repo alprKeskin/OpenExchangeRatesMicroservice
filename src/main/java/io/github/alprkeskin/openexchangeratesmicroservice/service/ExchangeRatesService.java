@@ -1,76 +1,69 @@
 package io.github.alprkeskin.openexchangeratesmicroservice.service;
 
-import io.github.alprkeskin.openexchangeratesmicroservice.model.LatestEndFormat;
-import io.github.alprkeskin.openexchangeratesmicroservice.properties.LatestEndUrlProperties;
-import io.github.alprkeskin.openexchangeratesmicroservice.repositories.LatestEndFormatRepository;
+import io.github.alprkeskin.openexchangeratesmicroservice.model.CurrencyRates;
+import io.github.alprkeskin.openexchangeratesmicroservice.properties.CurrencyRatesUrlProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.time.LocalDate;
+
 
 @Service
 public class ExchangeRatesService {
 
-    // it is used to use a string
-    // its value is injected in LatestEndUrlProperties class under the package "properties"
     @Autowired
-    private LatestEndUrlProperties urlProperties;
+    private CurrencyRatesUrlProperties urlProperties;
 
     // it autowires to the bean produced by RestTemplateConfig class under the package "config"
     @Autowired
     private RestTemplate restTemplate;
 
-    // this is the main url that we are going to use
-    // after this url we can add paths to it
-    // the last path parameter in the url is the end of the Url
+    /**
+    this is the main url that we are going to use
+    after this url we can add paths to it
+    the last path parameter in the url is the end of the Url
+     **/
     @Value("${alprkeskin.consumed-urls.api}")
     private String URL;
 
 
-    // this will be used to save the data to our mongoDb database
-    @Autowired
-    private LatestEndFormatRepository latestEndFormatRepository;
-
-    // this method saves the latest object to our database
-    public void saveLatest(LatestEndFormat latestObject) {
-        latestEndFormatRepository.save(latestObject);
+    public CurrencyRates getCurrencyRates(LocalDate date, String symbols) {
+        return restTemplate.getForObject(getUri(date, symbols), CurrencyRates.class);
     }
 
-    public LatestEndFormat getAndSaveLatest(String apiEndpoint, String app_id, String base, String symbols, boolean prettyprint, boolean show_alternative) {
-        // get the latest exchange values
-        LatestEndFormat latest = getLatest(apiEndpoint, app_id, base, symbols, prettyprint, show_alternative);
-        // save them to our database
-        saveLatest(latest);
-        // return the object
-        return latest;
-    }
+    // default values of query parameters
+    @Value("${query-parameter.app_id}")
+    String app_id;
+    @Value("${query-parameter.prettyprint}")
+    boolean prettyprint;
+    @Value("${query-parameter.show_alternative}")
+    boolean show_alternative;
 
+    public URI getUri(LocalDate date, String symbols) {
+        // URL: https://openexchangerates.org/api/
+        String commonUrl = URL;
+        String endpoint;
 
-    public LatestEndFormat getLatest(String apiEndpoint, String app_id, String base, String symbols, boolean prettyprint, boolean show_alternative) {
-        LatestEndFormat latest = restTemplate.getForObject(getUri(apiEndpoint, app_id, base, symbols, prettyprint, show_alternative), LatestEndFormat.class);
-        return latest;
-    }
-
-    public URI getUri(String apiEndpoint, String app_id, String base, String symbols, boolean prettyprint, boolean show_alternative) {
-        // String url = readFromValue ? URL : urlProperties.getApi();
-        String url = URL;
-        System.out.println("--------- ExchangeRatesService::getUri ---------");
-        System.out.println("Returned URI: " +
-                url + apiEndpoint + "?" + "app_id=" + app_id +
-                "&" + "base=" + base +
-                "&" + "symbols=" + symbols +
-                "&" + "prettyprint=" + prettyprint +
-                "&" + "show_alternative=" + show_alternative);
+        // if the desired date is the current date
+        if (date.isEqual(LocalDate.now())) {
+            // generate a request URI for latest endpoint
+            endpoint = "latest.json";
+        }
+        // if the desired date is not the current date
+        else {
+            // then generate a request URI for historical endpoint
+            endpoint = "historical/" + date.toString() + ".json";
+        }
 
         // initialize http request parses
-        String path = url + apiEndpoint;
+        String path = commonUrl + endpoint;
         String queryStart = "?";
         String app_idPart = "app_id=" + app_id;
-        String basePart = "&base=" + base;
         String symbolsPart;
-        if (symbols.equals("XXX")) {
+        if ("XXX".equals(symbols)) {
             symbolsPart = "";
         }
         else {
@@ -80,6 +73,8 @@ public class ExchangeRatesService {
         String show_alternativePart = "&show_alternative=" + show_alternative;
 
         return URI.create(path + queryStart + app_idPart + symbolsPart + prettyprintPart + show_alternativePart);
-
     }
 }
+
+
+

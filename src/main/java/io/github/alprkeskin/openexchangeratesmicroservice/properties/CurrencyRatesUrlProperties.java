@@ -8,8 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 @Configuration
-// value injection
 @ConfigurationProperties(prefix = "alprkeskin.consumed-urls")
-public class LatestEndUrlProperties {
+public class CurrencyRatesUrlProperties {
     private String api;
 }
