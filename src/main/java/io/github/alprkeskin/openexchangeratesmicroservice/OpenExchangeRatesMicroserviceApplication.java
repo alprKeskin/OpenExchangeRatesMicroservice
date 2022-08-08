@@ -26,10 +26,6 @@ public class OpenExchangeRatesMicroserviceApplication {
     @Autowired
     private OpenExchangeRatesMainService openExchangeRatesMainService;
 
-    /**
-    *: every
-    second minute hour day_of_month month day_of_week
-     */
     @Scheduled(cron = "*/10 * * * * *")
     public void getDailyRates() {
         logger.log(Level.INFO, "Scheduled getDailyRates...");

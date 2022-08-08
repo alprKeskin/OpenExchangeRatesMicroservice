@@ -13,11 +13,11 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @Service
 public class OpenExchangeRatesMainService {
+
     @Autowired
     private ExchangeRatesService exchangeRatesService;
     @Autowired
     private CurrencyPersistanceService currencyPersistanceService;
-
 
     public ResponseEntity<CurrencyRates> getResponse(LocalDate date, String symbols) {
 
@@ -37,4 +37,5 @@ public class OpenExchangeRatesMainService {
         // currencyRates.get() ==> currencyRate without optional
         return ok(currencyRates.get());
     }
+
 }

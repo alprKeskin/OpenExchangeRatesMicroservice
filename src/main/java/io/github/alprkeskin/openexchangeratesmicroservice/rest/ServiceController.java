@@ -15,10 +15,15 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/api")
 public class ServiceController {
+
     @Autowired
     private OpenExchangeRatesMainService openExchangeRatesMainService;
 
-    private static final Logger logger = LoggerFactory.getLogger(ServiceController.class);
+    /**
+     * org.slf4j.Logger is an interface
+     * So, we coded to interface (good approach)
+     **/
+    private final static Logger logger = LoggerFactory.getLogger(ServiceController.class);
 
     @GetMapping(value = {"", "/{requestedDate}"})
     public ResponseEntity<CurrencyRates> getResponse(
@@ -30,6 +35,7 @@ public class ServiceController {
         return openExchangeRatesMainService.getResponse(desiredDate, symbols);
     }
 }
+
 
 
 

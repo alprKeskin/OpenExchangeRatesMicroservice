@@ -20,12 +20,4 @@ public class CurrencyRates {
     private int timestamp;
     private String base;
     private Map<String, Double> rates;
-
-    public CurrencyRates(String disclaimer, String license, int timestamp, String base, Map<String, Double> rates) {
-        this.disclaimer = disclaimer;
-        this.license = license;
-        this.timestamp = timestamp;
-        this.base = base;
-        this.rates = rates;
-    }
 }
