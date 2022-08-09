@@ -15,8 +15,6 @@ import java.util.Map;
 public class CurrencyRates {
     @Id
     private String id;
-    private String disclaimer;
-    private String license;
     private int timestamp;
     private String base;
     private Map<String, Double> rates;
