@@ -15,8 +15,6 @@ spring:
   data:
     mongodb:
       authentication-database: admin
-      username: rootuser
-      password: rootpass
-      database: exchangeServiceDatabase
+      database: openExchangeServiceDatabase
       port: 27017
       host: localhost
