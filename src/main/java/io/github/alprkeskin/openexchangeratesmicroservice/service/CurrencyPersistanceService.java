@@ -12,6 +12,10 @@ import java.util.Optional;
 @Service
 public class CurrencyPersistanceService {
 
+    CurrencyPersistanceService(CurrencyRatesRepository currencyRatesRepository) {
+        this.currencyRatesRepository = currencyRatesRepository;
+    }
+
     // this will be used to connect to our mongoDb database
     @Autowired
     private CurrencyRatesRepository currencyRatesRepository;
