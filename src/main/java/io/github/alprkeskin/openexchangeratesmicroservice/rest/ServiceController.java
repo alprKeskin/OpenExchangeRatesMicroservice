@@ -1,7 +1,7 @@
 package io.github.alprkeskin.openexchangeratesmicroservice.rest;
 
 import io.github.alprkeskin.openexchangeratesmicroservice.model.CurrencyRates;
-import io.github.alprkeskin.openexchangeratesmicroservice.service.OpenExchangeRatesMainService;
+import io.github.alprkeskin.openexchangeratesmicroservice.service.OpenExchangeRatesMediatorService;
 import io.github.alprkeskin.openexchangeratesmicroservice.utils.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,13 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Map;
 
-/** The methods of this class automatically run according to the given path when a http request is sent **/
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/currency")
 public class ServiceController {
 
     @Autowired
-    private OpenExchangeRatesMainService openExchangeRatesMainService;
+    private OpenExchangeRatesMediatorService openExchangeRatesMediatorService;
 
     @GetMapping(value = {"", "/{requestedDate}"})
     public ResponseEntity<CurrencyRates> getCurrencyRates(
@@ -24,12 +23,12 @@ public class ServiceController {
             @RequestParam(value = "symbols", required = false, defaultValue = "XXX") String symbols) {
 
         LocalDate desiredDate = requestedDate == null ? LocalDate.now() : DateUtil.getLocalDate(requestedDate);
-        return ResponseEntity.ok(openExchangeRatesMainService.getCurrencyRates(desiredDate, symbols));
+        return ResponseEntity.ok(openExchangeRatesMediatorService.getCurrencyRates(desiredDate, symbols));
     }
 
-    @GetMapping(value = "currency/currencies")
+    @GetMapping(value = "/currencies")
     public ResponseEntity<Map> getCurrencies() {
-        return ResponseEntity.ok(openExchangeRatesMainService.getCurrencies());
+        return ResponseEntity.ok(openExchangeRatesMediatorService.getCurrencies());
     }
 }
 

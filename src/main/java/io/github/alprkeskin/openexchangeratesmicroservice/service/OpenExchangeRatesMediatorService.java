@@ -2,6 +2,9 @@ package io.github.alprkeskin.openexchangeratesmicroservice.service;
 
 
 import io.github.alprkeskin.openexchangeratesmicroservice.model.CurrencyRates;
+import io.github.alprkeskin.openexchangeratesmicroservice.service.exchangeRates.ExchangeRatesMediatorService;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,22 +14,19 @@ import java.util.Optional;
 
 
 @Service
-public class OpenExchangeRatesMainService {
+@NoArgsConstructor
+@AllArgsConstructor
+public class OpenExchangeRatesMediatorService {
 
     @Autowired
-    private ExchangeRatesService exchangeRatesService;
+    private ExchangeRatesMediatorService exchangeRatesMediatorService;
     @Autowired
     private CurrencyPersistanceService currencyPersistanceService;
-
-    OpenExchangeRatesMainService(ExchangeRatesService exchangeRatesService, CurrencyPersistanceService currencyPersistanceService) {
-        this.exchangeRatesService = exchangeRatesService;
-        this.currencyPersistanceService = currencyPersistanceService;
-    }
 
     public CurrencyRates getCurrencyRates(LocalDate date, String symbols) {
         Optional<CurrencyRates> currencyRates = currencyPersistanceService.findCurrencyRatesById(date);
         if (currencyRates.isEmpty()) {
-            CurrencyRates currencyRatesOfRelatedDate = exchangeRatesService.getCurrencyRates(date, symbols);
+            CurrencyRates currencyRatesOfRelatedDate = exchangeRatesMediatorService.getCurrencyRates(date, symbols);
             currencyPersistanceService.saveCurrencyRates(currencyRatesOfRelatedDate, date);
             return currencyRatesOfRelatedDate;
         }
@@ -34,7 +34,6 @@ public class OpenExchangeRatesMainService {
     }
 
     public Map getCurrencies() {
-        return exchangeRatesService.getCurrencies();
+        return exchangeRatesMediatorService.getCurrencies();
     }
-
 }

@@ -1,5 +1,7 @@
 server:
   port: 8082
+  servlet:
+    context-path: "/open_exchange_rates_api"
 
 alprkeskin:
   consumed-urls:
@@ -7,9 +9,6 @@ alprkeskin:
 
 query-parameter:
   app_id: "8749ae82dbde4276a7554e13d03ad71e"
-  base: "USD"
-  prettyprint: "false"
-  show_alternative: "false"
 
 spring:
   data:

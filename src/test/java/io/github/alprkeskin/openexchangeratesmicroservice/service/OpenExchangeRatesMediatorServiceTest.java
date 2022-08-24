@@ -2,36 +2,33 @@ package io.github.alprkeskin.openexchangeratesmicroservice.service;
 
 import io.github.alprkeskin.openexchangeratesmicroservice.model.CurrencyRates;
 import io.github.alprkeskin.openexchangeratesmicroservice.repositories.CurrencyRatesRepository;
+import io.github.alprkeskin.openexchangeratesmicroservice.service.exchangeRates.ExchangeRatesMediatorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.cglib.core.Local;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-class OpenExchangeRatesMainServiceTest {
+class OpenExchangeRatesMediatorServiceTest {
 
     private final String TRY_NAME = "Turkish Lira";
     private final String USD_NAME = "United States Dollar";
 
-    private OpenExchangeRatesMainService openExchangeRatesMainService;
-    private ExchangeRatesService exchangeRatesService;
+    private OpenExchangeRatesMediatorService openExchangeRatesMediatorService;
+    private ExchangeRatesMediatorService exchangeRatesMediatorService;
     private CurrencyPersistanceService currencyPersistanceService;
 
     @BeforeEach
     private void instantiateFields() {
-        exchangeRatesService = Mockito.mock(ExchangeRatesService.class);
+        exchangeRatesMediatorService = Mockito.mock(ExchangeRatesMediatorService.class);
         currencyPersistanceService = Mockito.mock(CurrencyPersistanceService.class);
-        openExchangeRatesMainService = new OpenExchangeRatesMainService(exchangeRatesService, currencyPersistanceService);
+        openExchangeRatesMediatorService = new OpenExchangeRatesMediatorService(exchangeRatesMediatorService, currencyPersistanceService);
     }
 
 
@@ -49,10 +46,10 @@ class OpenExchangeRatesMainServiceTest {
         String symbols = "USD,TRY,AUD";
 
         // set default behaviors for database methods
-        when(exchangeRatesService.getCurrencyRates(date, symbols)).thenReturn(defaultCurrencyRates);
+        when(exchangeRatesMediatorService.getCurrencyRates(date, symbols)).thenReturn(defaultCurrencyRates);
 
         // get your result
-        CurrencyRates currencyRates = openExchangeRatesMainService.getCurrencyRates(date, symbols);
+        CurrencyRates currencyRates = openExchangeRatesMediatorService.getCurrencyRates(date, symbols);
 
         // assert your statements
         assertNotNull(currencyRates);
